@@ -5,7 +5,7 @@ from vllm import AsyncLLMEngine, AsyncEngineArgs, SamplingParams
 from transformers import AutoTokenizer
 import threading
 import queue
-from .decoder import tokens_decoder_sync
+from .decoder import tokens_decoder_sync, tokens_decoder
 
 class OrpheusModel:
     def __init__(self, model_name, dtype=torch.bfloat16, tokenizer='canopylabs/orpheus-3b-0.1-pretrained', **engine_kwargs):
@@ -132,3 +132,20 @@ class OrpheusModel:
         return tokens_decoder_sync(self.generate_tokens_sync(**kwargs))
 
 
+    async def generate_tokens(self, prompt, voice=None, request_id="req-001", temperature=0.6, top_p=0.8, max_tokens=1200, stop_token_ids = [49158], repetition_penalty=1.3):
+        prompt_string = self._format_prompt(prompt, voice)
+        print(prompt)
+        sampling_params = SamplingParams(
+        temperature=temperature,
+        top_p=top_p,
+        max_tokens=max_tokens,  # Adjust max_tokens as needed.
+        stop_token_ids = stop_token_ids,
+        repetition_penalty=repetition_penalty,
+        )
+
+        async for result in self.engine.generate(prompt=prompt_string, sampling_params=sampling_params, request_id=request_id):
+            yield result.outputs[0].text
+
+
+    async def generate_speech_async(self, **kwargs):
+        return tokens_decoder(self.generate_tokens(**kwargs))
