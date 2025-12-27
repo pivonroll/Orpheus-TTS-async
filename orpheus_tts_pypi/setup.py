@@ -11,7 +11,7 @@ setup(
     description="Orpheus Text-to-Speech System",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/canopyai/orpheus-tts",
+    url="https://github.com/pivonroll/Orpheus-TTS-async",
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
